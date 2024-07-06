@@ -13,6 +13,7 @@ def log_message(message):
     """
     로그 메시지를 etl_project_log.txt 파일에 기록
     """
+    # 현재 시간과 메시지를 로그 형식으로 저장
     timestamp = datetime.now().strftime('%Y-%B-%d-%H-%M-%S')
     log_entry = f"{timestamp}, {message}\n"
     with open("etl_project_log.txt", "a") as log_file:
@@ -25,39 +26,28 @@ def fetch_gdp_data():
     """
     log_message("데이터 추출 시작") 
     url = 'https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(nominal)'
-    response = requests.get(url)
+    response = requests.get(url) 
+    
     soup = BeautifulSoup(response.content, 'html.parser')
-
-    # 적절한 테이블 선택
     table = soup.find('table', {'class': 'wikitable sortable sticky-header-multi static-row-numbers'})
 
-    # 테이블이 없을 경우 예외처리
     if table is None:
         log_message("Wikipedia 페이지에서 테이블을 찾을 수 없음")
         raise ValueError("Wikipedia 페이지에서 테이블을 찾을 수 없음")
 
-    # 테이블 모든 행 추출
     rows = table.find_all('tr')
     data = []
 
     # 각 행의 데이터를 파싱
-    for row in rows[3:]:   
+    for row in rows[3:]: 
         cols = row.find_all('td')
         if len(cols) < 3:
-            continue
+            continue 
             
         country = cols[0].text.strip()
         gdp_text = cols[1].text.strip()
-        gdp = re.sub(r'\[.*?\]', '', gdp_text).replace(',', '')
-        
-        try:
-            gdp = float(gdp)
-        except ValueError:
-            continue 
+        data.append([country, gdp_text]) 
 
-        data.append([country, gdp])
-
-    # 추출된 데이터 반환
     log_message("데이터 추출 완료")
     return data 
 
@@ -68,8 +58,19 @@ def transform_gdp_data(data):
     """
     log_message("데이터 변환 시작")
     
-    # 데이터프레임 생성
-    df = pd.DataFrame(data, columns=['Country', 'GDP (Millions of USD)'])
+    transformed_data = []
+    for row in data:
+        country, gdp_text = row
+        gdp = re.sub(r'\[.*?\]', '', gdp_text).replace(',', '') 
+        
+        try:
+            gdp = float(gdp)
+        except ValueError:
+            continue 
+        
+        transformed_data.append([country, gdp])
+
+    df = pd.DataFrame(transformed_data, columns=['Country', 'GDP (Millions of USD)'])
 
     # GDP를 1B USD로 변환 및 소수점 2자리까지 표시
     df['GDP (Billions of USD)'] = df['GDP (Millions of USD)'] / 1000
@@ -83,15 +84,15 @@ def transform_gdp_data(data):
     return df_sorted
 
 # 데이터 로드 함수 (JSON)
-def load_gdp_data_to_json(df, filename='Countries_by_GDP.json'):
+def load_gdp_data(df, filename='Countries_by_GDP.json'):
     """
     변환된 데이터를 JSON 파일로 저장합니다.
     """
     log_message("데이터를 JSON 파일로 저장 시작")
     
-    # JSON 파일로 저장
+    # 데이터프레임을 JSON 파일로 저장
     df.to_json(filename, orient='records', lines=True, force_ascii=False)
-    
+   
     log_message("데이터를 JSON 파일로 저장 완료")
 
 # 데이터 로드 함수 (SQLite)
@@ -104,8 +105,6 @@ def load_gdp_data_to_sqlite(df, db_filename='World_Economies.db'):
     # SQLite 데이터베이스에 연결
     conn = sqlite3.connect(db_filename)
     cursor = conn.cursor()
-    
-    # 테이블 생성
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS Countries_by_GDP (
         Country TEXT PRIMARY KEY,
@@ -113,14 +112,13 @@ def load_gdp_data_to_sqlite(df, db_filename='World_Economies.db'):
     )
     ''')
 
-    # 데이터 삽입
+    # 데이터프레임의 각 행을 반복하면서 데이터를 삽입
     for _, row in df.iterrows():
         cursor.execute('''
         INSERT OR REPLACE INTO Countries_by_GDP (Country, GDP_USD_billion)
         VALUES (?, ?)
         ''', (row['Country'], row['GDP (Billions of USD)']))
     
-    # 변경사항 저장 및 연결 종료
     conn.commit()
     conn.close()
     
@@ -133,6 +131,7 @@ def execute_sql_query(query, db_filename='World_Economies.db'):
     """
     conn = sqlite3.connect(db_filename)
     df = pd.read_sql_query(query, conn)
+    
     conn.close()
     return df
 
@@ -150,7 +149,7 @@ def etl_process():
     df_sorted = transform_gdp_data(data)
     
     # 데이터 로드 (JSON)
-    load_gdp_data_to_json(df_sorted)
+    load_gdp_data(df_sorted)
     
     # 데이터 로드 (SQLite)
     load_gdp_data_to_sqlite(df_sorted) 
@@ -175,10 +174,11 @@ def etl_process():
     print("각 Region별로 top5 국가의 GDP 평균")
 
     df = pd.read_csv('region.csv')
-    df = df[['Country', 'GDP_USD_billions', 'Region']]   
+    df = df[['Country', 'GDP_USD_billions', 'Region']] 
+    
     conn = sqlite3.connect(':memory:')
     df.to_sql('region', conn, index=False, if_exists='replace')
-    
+
     query = """
     WITH RankedCountries AS (
         SELECT 
@@ -193,7 +193,7 @@ def etl_process():
     WHERE rank <= 5
     GROUP BY Region
     """
-    
+
     df_region = pd.read_sql_query(query, conn)
     df_region = df_region.sort_values(by=['Region', 'avg_gdp'], ascending=[True, False])   
     df_region.index = df_region.index + 1   
