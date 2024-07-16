@@ -25,7 +25,6 @@ http://localhost:8042 # NodeManager
 
 ```bash 
 docker exec -it hadoop-container bash # 새 터미널열고 Docker 컨테이너 내부에 접속
-
 hdfs dfs -mkdir /user # HDFS에 디렉터리 생성 
 hdfs dfs -mkdir /user/root
 ```　
