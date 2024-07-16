@@ -24,7 +24,18 @@ http://localhost:8042 # NodeManager
 ## HDFS에 저장
 
 ```bash
-docker exec -it hadoop-container bash # 새 터미널열고 Docker 컨테이너 내부에 접속
-hdfs dfs -mkdir /user # HDFS에 디렉터리 생성 
+# Docker 컨테이너 내부에 접속
+docker exec -it hadoop-container bash
+
+# HDFS에 디렉터리 생성 
+hdfs dfs -mkdir /user
 hdfs dfs -mkdir /user/root
+```
+
+## 파일을 HDFS에 업로드
+
+```bash
+# 컨테이너 내부에서 파일을 생성하고 HDFS에 업로드
+echo "Hello Hadoop" > hello.txt
+hdfs dfs -put hello.txt /user/root/
 ```
