@@ -39,3 +39,16 @@ hdfs dfs -mkdir /user/root
 echo "Hello Hadoop" > hello.txt
 hdfs dfs -put hello.txt /user/root/
 ```
+
+## HDFS에서 파일 가져오기
+
+```bash
+# 컨테이너 내부에서 HDFS에 업로드한 파일을 조회
+hdfs dfs -cat /user/root/hello.txt # Hello Hadoop
+```
+
+## HDFS 웹 인터페이스 접근
+
+```bash
+웹 브라우저에서 http://localhost:9870으로 이동하여 HDFS 웹 인터페이스에 접근
+```
