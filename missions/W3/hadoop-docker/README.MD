@@ -14,7 +14,7 @@ docker run -it --platform linux/amd64 --name hadoop-container -p 9870:9870 -p 98
 
 ## 컨테이너 실행 상태 확인
 
-```bash
+```
 http://localhost:9870 # NameNode
 http://localhost:9864 # DataNode
 http://localhost:8088 # ResourceManager
