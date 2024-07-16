@@ -19,12 +19,12 @@ http://localhost:9870 # NameNode
 http://localhost:9864 # DataNode
 http://localhost:8088 # ResourceManager
 http://localhost:8042 # NodeManager 
-```　
+```
 
 ## HDFS에 저장
 
-```bash 
+```bash
 docker exec -it hadoop-container bash # 새 터미널열고 Docker 컨테이너 내부에 접속
 hdfs dfs -mkdir /user # HDFS에 디렉터리 생성 
 hdfs dfs -mkdir /user/root
-```　
+```
