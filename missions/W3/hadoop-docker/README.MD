@@ -9,7 +9,8 @@ docker build -t hadoop-single-node .
 ## Docker 컨테이너 실행
 
 ```bash
-docker run -it --platform linux/amd64 --name hadoop-container -p 9870:9870 -p 9864:9864 -p 8088:8088 -p 8042:8042 hadoop-single-node  
+docker run -it --platform linux/amd64 --name hadoop-container -p 9870:9870 -p 9864:9864 -p 8088:8088 -p 8042:8042 hadoop-single-node
+```
 
 ## 컨테이너 실행 상태 확인
 
