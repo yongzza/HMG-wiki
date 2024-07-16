@@ -4,6 +4,7 @@
 
 ```bash
 docker build -t hadoop-single-node .  
+```
 
 ## Docker 컨테이너 실행
 
