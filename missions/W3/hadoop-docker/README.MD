@@ -6,6 +6,15 @@
 docker build -t hadoop-single-node .  
 ```
 
+## Docker 볼륨 생성
+
+```bash
+docker volume create hadoop-data 
+```
+- 데이터를 지속시키기 위해 Docker 볼륨을 사용하여 호스트 머신의 디렉토리와 컨테이너의 Hadoop 데이터 디렉토리를 연결
+    - 컨테이너가 중지되거나 다시 시작되더라도 데이터는 유지
+
+
 ## Docker 컨테이너 실행
 
 ```bash
