@@ -94,3 +94,17 @@ $HADOOP_HOME/sbin/start-dfs.s
 netstat -tuln | grep 9870
 ```
 
+- 컨테이너가 중지되었다가 다시 시작되더라도 HDFS에 저장된 데이터가 그대로 유지
+
+```bash
+docker exec -it hadoop-container bash
+
+hdfs dfs -mkdir /user
+hdfs dfs -mkdir /user/root
+
+echo "Hello Hadoop" > hello.txt
+hdfs dfs -put hello.txt /user/root/
+
+hdfs dfs -cat /user/root/hello.txt # Hello Hadoop
+```
+
